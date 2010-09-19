@@ -7,7 +7,7 @@ class ObjectProxy extends Base\Object
      * @var array
      */
     protected static $_defaultOptions = array(
-        'skipMethods'     => array(),
+        'trackMethods'    => array(),
         'throwExceptions' => false,
         'errorLevel'      => E_USER_WARNING,
     );
@@ -140,9 +140,9 @@ class ObjectProxy extends Base\Object
      */
     public function __call($method, array $params)
     {
-        $methodsToSkip = (array)$this->_options['skipMethods'];
+        $methodsToTrack = (array)$this->_options['trackMethods'];
         
-        if (count($methodsToSkip) && !in_array($method, $methodsToSkip)) {
+        if (count($methodsToTrack) && !in_array($method, $methodsToTrack)) {
             return call_user_func_array(array($this->_object, $method), $params);
         }
         
