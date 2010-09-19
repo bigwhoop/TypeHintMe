@@ -45,5 +45,5 @@ $auth = $factory->create('App\Auth', $constructorParams);
 
 That's about it. :)
 
-PS: Oh, and of course TypeHintMe is not meant for productive work. But it can
-come in pretty handy if you want to track grubby method calls inside your app.
+PS: Oh, and yeah, TypeHintMe is not meant for production work. But it can come
+in pretty handy if you want to track grubby method calls inside your app. :]
