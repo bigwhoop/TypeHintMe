@@ -1,7 +1,7 @@
 ﻿I had this idea about using the __call magic method to implement a simple
-form of type hinting in PHP. As we all already use phpDocumentor to comment
-our methods, I thought it would be pretty handy to just use the @param tag
-as invoker. An example:
+form of type hinting in PHP. Because we all already use phpDocumentor to
+comment our methods, I thought it would be pretty handy to just use the @param
+tag as the invoker. An example:
 
 <?php
 class Auth
@@ -16,8 +16,8 @@ class Auth
 }
 ?>
 
-In order to catch all calls to the Auth->authenticate() method we need to
-wrap something aroung the Auth class. Here comes TypeHintMe's ObjectObserver.
+In order to catch all calls to the Auth->authenticate() method we need to wrap
+something aroung the Auth class. Here comes TypeHintMe's ObjectProxy into play.
 
 <?php
 namespace App;
