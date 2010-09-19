@@ -1,0 +1,49 @@
+﻿I had this idea about using the __call magic method to implement a simple
+form of type hinting in PHP. As we all already use phpDocumentor to comment
+our methods, I thought it would be pretty handy to just use the @param tag
+as invoker. An example:
+
+<?php
+class Auth
+{
+    /**
+     * @param string $username
+     * @param string $password
+     * @param bool $regenerateSessionId
+     */
+    public function authenticate($username, $password, $regenerateSessionId)
+    {}
+}
+?>
+
+In order to catch all calls to the Auth->authenticate() method we need to
+wrap something aroung the Auth class. Here comes TypeHintMe's ObjectObserver.
+
+<?php
+namespace App;
+use BigWhoop\TypeHintMe;
+
+require 'Auth.php';
+require 'TypeHintMe.phar';
+
+$auth = new Auth();
+$auth->authenticate('Philippe', 'Gerber', 1);    // No error
+
+$auth = new TypeHintMe\ObjectProxy($auth);
+$auth->authenticate('Philippe', 'Gerber', true); // No error
+$auth->authenticate('Philippe', 'Gerber', 1);    // Error: Argument 3...
+?>
+
+If you want to validate a constructor as well you have to use the
+ObjectProxyFactory->create() method.
+
+<?php
+$factory = new TypeHinteMe\ObjectProxyFactory();
+$constructorParams = array('alwaysRegenerateSessionId' => true);
+$auth = $factory->create('App\Auth', $constructorParams);
+?>
+
+That's about it. :)
+
+PS: Oh, and of course TypeHintMe is not meant for productive work. But it can
+come in pretty handy if you want to track grubby method calls inside your app.

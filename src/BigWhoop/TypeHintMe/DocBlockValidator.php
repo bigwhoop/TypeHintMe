@@ -1,41 +1,75 @@
 <?php
 namespace BigWhoop\TypeHintMe;
 
-class DocBlockValidator
+class DocBlockValidator extends Base\Object
 {
-    public function validate($docBlock, array $params)
+    protected $_docBlock = null;
+    protected $_typeHints = array();
+    
+    
+    /**
+     * __construct
+     * 
+     * @param string $docBlock
+     * @param array $options
+     */
+    public function __construct($docBlock, array $options = array())
     {
-        $typeHints = $this->extractTypeHints($docBlock);
+        $this->_docBlock  = $docBlock;
+        $this->_typeHints = $this->_extractTypeHints();
         
-        $errors = array();
-        foreach ($params as $idx => $value) {
-            if (!array_key_exists($idx, $typeHints)) {
-                break;
-            }
-            
-            $paramErrors = $this->validateValue($value, $typeHints[$idx]);
-            
-            if (count($paramErrors) == count($typeHints[$idx])) {
-                $errors[$idx + 1] = $paramErrors;
-            }
-        }
-        
-        return $errors;
+        parent::__construct($options);
     }
     
     
-    public function extractTypeHints($docBlock)
+    /**
+     * Validate a set of params for this doc block
+     * 
+     * Return value is an array containing a key for each checked argument
+     * with a boolean value which indicates whether the validation was
+     * successful.
+     * 
+     *  array(
+     *    '1' => true,
+     *    '2' => false
+     *  )
+     * 
+     * @param array $params
+     * @return array
+     */
+    public function validate(array $params)
     {
-        $words = preg_split('/\s/', $docBlock, null, PREG_SPLIT_NO_EMPTY);
+        $result = array();
         
-        $typeHints = array();
-        for ($c = count($words), $i = 1; $i < $c; $i++) {
-            if ('@param' == $words[$i - 1]) {
-                $typeHints[] = explode('|', $words[$i]);
+        foreach ($params as $idx => $value) {
+            $argIdx = $idx + 1;
+            
+            $types = $this->getTypesForArgument($argIdx);
+            
+            // If argument is just out of range that's not a real
+            // validation error. It's missing, but that's not what
+            // we want to check.
+            if (empty($types)) {
+                $result[$argIdx] = true;
+                continue;
             }
+            
+            $result[$argIdx] = $this->validateValue($value, $types);
         }
         
-        return $typeHints;
+        return $result;
+    }
+    
+    
+    public function getTypesForArgument($argumentIndex)
+    {
+        $idx = $argumentIndex - 1;
+        
+        if (!array_key_exists($idx, $this->_typeHints)) {
+            return array();
+        }
+        
+        return $this->_typeHints[$idx];
     }
     
     
@@ -44,7 +78,7 @@ class DocBlockValidator
      * 
      * @param mixed $value
      * @param array $types
-     * @return array        An array containing the names of all mis-matched data types.
+     * @return bool
      */
     public function validateValue($value, array $types)
     {
@@ -117,6 +151,21 @@ class DocBlockValidator
             }
         }
         
-        return $errors;
+        return count($errors) != count($types);
+    }
+    
+    
+    protected function _extractTypeHints()
+    {
+        $words = preg_split('/\s/', $this->_docBlock, null, PREG_SPLIT_NO_EMPTY);
+        
+        $typeHints = array();
+        for ($c = count($words), $i = 1; $i < $c; $i++) {
+            if ('@param' == $words[$i - 1]) {
+                $typeHints[] = explode('|', $words[$i]);
+            }
+        }
+        
+        return $typeHints;
     }
 }

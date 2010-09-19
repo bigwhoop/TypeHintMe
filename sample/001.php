@@ -31,15 +31,17 @@ class User
     }
 }
 
+
+$proxyFactory = new TypeHintMe\ObjectProxyFactory($options = array(
+    'throwExceptions' => false,
+    'errorLevel' => E_USER_WARNING,
+));
+
 // No warnings
 $user1 = new User('Philippe', 123);
 echo $user1->format(null);
 
 
 // Warnings
-$options = array(
-    'throwExceptions' => false,
-    'errorLevel' => E_USER_WARNING,
-);
-$user2 = TypeHintMe\ObjectObserver::create('App\User', array('Philippe', 123), $options);
+$user2 = $proxyFactory->create('App\User', array('Philippe', 123));
 echo $user2->format(null);
