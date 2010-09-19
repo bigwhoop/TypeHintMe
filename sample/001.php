@@ -31,8 +31,7 @@ class User
     }
 }
 
-
-$proxyFactory = new TypeHintMe\ObjectProxyFactory($options = array(
+TypeHintMe\ObjectProxy::setDefaultOptions(array(
     'throwExceptions' => false,
     'errorLevel' => E_USER_WARNING,
 ));
@@ -41,7 +40,6 @@ $proxyFactory = new TypeHintMe\ObjectProxyFactory($options = array(
 $user1 = new User('Philippe', 123);
 echo $user1->format(null);
 
-
 // Warnings
-$user2 = $proxyFactory->create('App\User', array('Philippe', 123));
+$user2 = TypeHintMe\ObjectProxyFactory::create('App\User', array('Philippe', 123));
 echo $user2->format(null);

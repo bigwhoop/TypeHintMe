@@ -6,12 +6,11 @@ class ObjectProxy extends Base\Object
     /**
      * @var array
      */
-    protected $_options = array(
+    protected static $_defaultOptions = array(
         'skipMethods'     => array(),
         'throwExceptions' => false,
-        'errorLevel'      => E_USER_ERROR,
+        'errorLevel'      => E_USER_WARNING,
     );
-    
     
     /**
      * @var object
@@ -22,6 +21,30 @@ class ObjectProxy extends Base\Object
      * @var array
      */
     protected $_cache = array();
+    
+    
+    /**
+     * Return the default options
+     * 
+     * @return array
+     */
+    static public function getDefaultOptions()
+    {
+        return self::$_defaultOptions;
+    }
+    
+    
+    /**
+     * Set the default options
+     * 
+     * @param array $options
+     */
+    static public function setDefaultOptions(array $options)
+    {
+        $options = Options::merge(self::getDefaultOptions(), $options);
+        
+        self::$_defaultOptions = $options;
+    }
     
     
     /**
@@ -42,7 +65,28 @@ class ObjectProxy extends Base\Object
     }
     
     
-    public function validateMethod($method, array $params)
+    /**
+     * Set the proxy options
+     * 
+     * @param array $options
+     * @return BigWhoop\TypeHintMe\ObjectProxy
+     */
+    public function setOptions(array $options)
+    {
+        $this->_options = Options::merge(self::getDefaultOptions(), $options);
+        
+        return $this;
+    }
+    
+    
+    /**
+     * Validate a specific method with a given set of parameters
+     * 
+     * @param string $method
+     * @param array $params
+     * @return mixed
+     */
+    public function proxyMethod($method, array $params)
     {
         $classMethod = get_class($this->_object) . '::' . $method . '()';
         
@@ -102,6 +146,6 @@ class ObjectProxy extends Base\Object
             return call_user_func_array(array($this->_object, $method), $params);
         }
         
-        return $this->validateMethod($method, $params);
+        return $this->proxyMethod($method, $params);
     }
 }

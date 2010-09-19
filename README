@@ -38,9 +38,8 @@ If you want to validate a constructor as well you have to use the
 ObjectProxyFactory->create() method.
 
 <?php
-$factory = new TypeHinteMe\ObjectProxyFactory();
 $constructorParams = array('alwaysRegenerateSessionId' => true);
-$auth = $factory->create('App\Auth', $constructorParams);
+$auth = TypeHinteMe\ObjectProxyFactory::create('App\Auth', $constructorParams);
 ?>
 
 That's about it. :)
